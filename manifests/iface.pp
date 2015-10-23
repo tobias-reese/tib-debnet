@@ -169,7 +169,7 @@ define debnet::iface (
   validate_string($ifname)
   validate_bool($auto)
   validate_array($allows)
-  validate_re($family, '^inet$' )
+  validate_re($family, '^inet6?$' )
   validate_re($method, '^loopback$|^dhcp$|^static$|^manual$')
   validate_hash($aux_ops)
   validate_array($pre_ups)
@@ -223,13 +223,13 @@ define debnet::iface (
     }
 
     'static' : {
-      validate_re($address, '^(:?[0-9]{1,3}\.){3}[0-9]{1,3}$')
+      validate_re($address, '^((:?[0-9]{1,3}\.){3}[0-9]{1,3}|(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])))$')
       validate_re($netmask, '^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[0-9]{1,2}$')
       if $broadcast {
         validate_re($broadcast, '^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[+-]$')
       }
       if $metric { validate_re($metric, '^\d+$') }
-      if $gateway { validate_re($gateway, '(:?[0-9]{1,3}\.){3}[0-9]{1,3}$') }
+      if $gateway { validate_re($gateway, '((:?[0-9]{1,3}\.){3}[0-9]{1,3}|(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])))$') }
       if $pointopoint {
         validate_re($pointopoint, '(:?[0-9]{1,3}\.){3}[0-9]{1,3}$')
       }
@@ -239,7 +239,7 @@ define debnet::iface (
       if $mtu { validate_re($mtu, '^\d+$') }
       if $scope { validate_re($scope, '^global$|^link$|^host$') }
 
-      concat::fragment { "${ifname}_stanza":
+      concat::fragment { "${title}_stanza":
         target  => $debnet::params::interfaces_file,
         content => template(
           'debnet/iface_header.erb',
@@ -251,7 +251,7 @@ define debnet::iface (
     }
 
     'manual' : {
-      concat::fragment { "${ifname}_stanza":
+      concat::fragment { "${title}_stanza":
         target  => $debnet::params::interfaces_file,
         content => template(
           'debnet/iface_header.erb',

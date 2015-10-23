@@ -1,4 +1,4 @@
-iface <%= @ifname -%> inet static
+iface <%= @ifname -%> <%= @family -%> static
   address <%= @address %>
   netmask <%= @netmask %>
 <% if @broadcast -%>

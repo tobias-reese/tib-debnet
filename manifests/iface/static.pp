@@ -142,9 +142,9 @@ define debnet::iface::static (
   validate_string($ifname)
   validate_bool($auto)
   validate_array($allows)
-  validate_re($family, '^inet$' )
+  validate_re($family, '^inet6?$' )
 
-  debnet::iface { $ifname:
+  debnet::iface { $title:
     method          => 'static',
     auto            => $auto,
     allows          => $allows,
@@ -168,6 +168,7 @@ define debnet::iface::static (
     routes          => $routes,
     dns_nameservers => $dns_nameservers,
     dns_search      => $dns_search,
+    ifname          => $ifname,
     
   }
 }
